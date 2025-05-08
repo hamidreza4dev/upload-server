@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>File Upload Client (CORS Test)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 500px;
+      margin: 2em auto;
+    }
+
+    input,
+    button {
+      margin: 0.5em 0;
+    }
+
+    #result {
+      margin-top: 1em;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Upload a File</h1>
+  <form id="uploadForm">
+    <input type="file" id="fileInput" name="file" required />
+    <button type="submit">Upload</button>
+  </form>
+
+  <h2>Delete a File</h2>
+  <input type="text" id="deleteFilename" placeholder="Filename to delete" />
+  <button id="deleteBtn">Delete</button>
+
+  <div id="result"></div>
+
+  <script>
+    const result = document.getElementById('result');
+
+    document.getElementById('uploadForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('fileInput');
+      if (!fileInput.files.length) return;
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      try {
+        const res = await fetch('http://localhost:3000/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        result.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        result.textContent = 'Error: ' + err;
+      }
+    };
+
+    document.getElementById('deleteBtn').onclick = async () => {
+      const filename = document.getElementById('deleteFilename').value;
+      if (!filename) return;
+      try {
+        const res = await fetch('http://localhost:3000/upload', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename }),
+        });
+        const data = await res.json();
+        result.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        result.textContent = 'Error: ' + err;
+      }
+    };
+  </script>
+</body>
+
+</html>
