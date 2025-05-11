@@ -5,10 +5,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { cors } from "hono/cors";
 
-const __dirname = new URL(".", import.meta.url).pathname;
-
-const app = new Hono();
-const uploadsDir = path.join(__dirname, "..", "uploads");
+const __dirname = path.dirname(
+  new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")
+);
+const uploadsDir = path.resolve(__dirname, "..", "uploads");
 
 // Create uploads directory if it doesn't exist
 if (!fs.existsSync(uploadsDir)) {
@@ -16,6 +16,7 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Serve static files from uploads directory
+const app = new Hono();
 app.use(cors());
 
 // Serve static files from uploads directory
